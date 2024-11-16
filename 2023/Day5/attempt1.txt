@@ -1,0 +1,150 @@
+﻿var lines = File.ReadAllLines("C:\\code\\advent-of-code-2023\\Day5\\input.txt");
+
+var seeds = new List<uint>();
+
+var seedToSoil = new Map();
+var soiToFertilizer = new Map();
+var fertilizerToWater = new Map();
+var waterToLight = new Map();
+var lightToTempruture = new Map();
+var tempToHumidity = new Map();
+var humToLocation = new Map();
+
+seeds.AddRange(lines[0].Split(' ').Where(x => x.All(char.IsDigit)).Select(uint.Parse));
+
+var previousLineCount = 0;
+
+while (previousLineCount + 1 != lines.Length)
+{
+    var lineBre = lines.Skip(previousLineCount + 2).TakeWhile(x => x != String.Empty).ToArray();
+    previousLineCount += lineBre.Length + 1;
+    
+    var activeMapping = lineBre
+        .Skip(1)
+        .Select(line => line
+            .Split(' ')
+            .Select(uint.Parse)
+            .ToArray())
+        .Select(split => new Map(split[0], split[1], split[2]))
+        .ToArray();
+
+    if (lineBre.Any(x => x.Contains("seed-to-soil")))
+    { 
+        seedToSoil = Map.CombineMaps(activeMapping);
+    }
+    else if (lineBre.Any(x => x.Contains("soil-to-fertilizer")))
+    {
+        soiToFertilizer = Map.CombineMaps(activeMapping); 
+    }
+    else if (lineBre.Any(x => x.Contains("fertilizer-to-water")))
+    {
+        fertilizerToWater = Map.CombineMaps(activeMapping); 
+    }
+    else if (lineBre.Any(x => x.Contains("water-to-light")))
+    {
+        waterToLight = Map.CombineMaps(activeMapping); 
+    }
+    else if (lineBre.Any(x => x.Contains("light-to-temperature")))
+    {
+        lightToTempruture = Map.CombineMaps(activeMapping); 
+    }
+    else if (lineBre.Any(x => x.Contains("temperature-to-humidity")))
+    {
+        tempToHumidity = Map.CombineMaps(activeMapping); 
+    }
+    else if (lineBre.Any(x => x.Contains("humidity-to-location")))
+    {
+        humToLocation = Map.CombineMaps(activeMapping); 
+    }
+}
+
+var lowest = uint.MaxValue;
+foreach (var seed in seeds)
+{
+    var soil = seedToSoil[seed];
+    var fert = soiToFertilizer[soil];
+    var water = fertilizerToWater[fert];
+    var light = waterToLight[water];
+    var temp = lightToTempruture[light];
+    var hum = tempToHumidity[temp];
+    var loc = humToLocation[hum];
+
+    if (loc < lowest)
+    {
+        lowest = loc;
+    }
+}
+
+;
+
+public class Map
+{
+    public Dictionary<int, Dictionary<uint, uint>> SourceToDestinationMap { get; set; }
+    public (uint From, uint To) RangeOfSource { get; set; }
+    public (uint From, uint To) RangeOfDestination { get; set; }
+
+    public Map(){}
+    public Map(IEnumerable<Map> src)
+    {
+        var sourceToDestinationMap = src.ToArray();
+        
+        RangeOfSource = (sourceToDestinationMap.Min(x => x.RangeOfSource.From),
+            sourceToDestinationMap.Max(x => x.RangeOfSource.To));
+        
+        RangeOfDestination = (sourceToDestinationMap.Min(x => x.RangeOfDestination.From),
+            sourceToDestinationMap.Max(x => x.RangeOfDestination.To));
+        
+        SourceToDestinationMap = sourceToDestinationMap.SelectMany(x => x.SourceToDestinationMap).ToDictionary(x => x.Key, x => x.Value);
+    }
+
+    public Map(uint destination, uint source, uint range)
+    {
+        var dest = Enumerable.Range(destination, range);
+        var src = Enumerable.Range(source, range);
+
+
+        RangeOfSource = (source, source + range);
+        RangeOfDestination = (destination, destination + range);
+        var i = 0;
+
+        SourceToDestinationMap = src.Zip(dest).Chunk(10_000_000).ToDictionary(_ => i++, x => x.ToDictionary(y =>y.First, y => y.Second) );
+    }
+
+    public static Map CombineMaps(IEnumerable<Map> maps)
+    {
+        return new Map(maps);
+    }
+
+    public uint this[uint i]
+    {
+        get
+        {
+            if (RangeOfSource.From > i || RangeOfSource.To < i)
+            {
+                return i;
+            }
+            else
+            {
+                var test = SourceToDestinationMap.FirstOrDefault(x => 
+                    x.Value.TryGetValue(i, out var t)
+                );
+                return test.Value[i];
+            }
+            
+        }
+    }
+    //SourceToDestinationMap.TryGetValue((uint) i, out var resu) ? resu : i;
+    // i <= uint.MaxValue 
+    //     ? 
+    //     : i;4.158.820.986
+}
+
+
+public static class Enumerable {
+    public static IEnumerable<uint> Range(uint start, uint count) {
+        var end = start + count;
+        for(var current = start; current < end; ++current) {
+            yield return current;
+        }
+    }
+}
