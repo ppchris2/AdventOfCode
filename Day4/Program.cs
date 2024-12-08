@@ -1,8 +1,9 @@
 ﻿
 var t =
     "MMMSXXMASM\nMSAMXMSMSA\nAMXSXMAAMM\nMSAMASMSMX\nXMASAMXAMM\nXXAMMXXAMA\nSMSMSASXSS\nSAXAMASAAA\nMAMMMXMMMM\nMXMXAXMASX";
+var input = File.ReadAllText("C:\\code\\AdventOfCode\\Day4\\input.txt");
 
-var lines = t.Split('\n');
+var lines = input.Split('\n');
 var matrix = new char[lines[0].Length, lines.Length];
 
 for (var i = 0; i < lines.GetLength(0); i++)
@@ -23,13 +24,14 @@ var masks = new[]
 
     new[,] { { 'S','.','M' }, {'.', 'A', '.'}, { 'S','.','M' }}
 };
-
+var count = 0;
 foreach (var mask in masks)
 {
-    Traverse( mask, matrix);
+    count += Traverse( mask, matrix);
 }
 
-void Traverse(char[,] mask, char[,] matrix)
+;
+int Traverse(char[,] mask, char[,] matrix)
 {
     var count = 0;
 
@@ -37,16 +39,18 @@ void Traverse(char[,] mask, char[,] matrix)
     {
         for (var y = 1; y < matrix.GetLength(1)-1; y++)
         {
-            if (matrix[i + y - 1, i  - 1] == mask[i + y - 1, i  - 1] &&
-                matrix[i + y, i ] == mask[i + y, i ] &&
-                matrix[i + y + 1, i  + 1] == mask[i + y + 1, i  + 1] &&
-                matrix[i + y + 1, i  - 1] == mask[i + y + 1, i  - 1] &&
-                matrix[i + y + 1, i  - 1] == mask[i + y + 1, i  - 1])
+            if (
+                matrix[i, y] == mask[1, 1] &&
+                matrix[i  - 1, y  - 1] == mask[0, 0] &&
+                matrix[i + 1, y +1] == mask[2, 2] &&
+                matrix[i -1, y + 1 ] == mask[0, 2] &&
+                matrix[i + 1, y-1 ] == mask[2, 0] )
             {
                 count++;
             }
         }   
     }
+    return count;
 }
 
 Console.WriteLine("Hello, World!");
