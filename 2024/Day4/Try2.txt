@@ -1,0 +1,188 @@
+﻿// See https://aka.ms/new-console-template for more information
+
+using System.Drawing;
+using System.Text;
+
+var example =
+    "MMMSXXMASM\nMSAMXMSMSA\nAMXSXMAAMM\nMSAMASMSMX\nXMASAMXAMM\nXXAMMXXAMA\nSMSMSASXSS\nSAXAMASAAA\nMAMMMXMMMM\nMXMXAXMASX";
+var file = File.ReadAllLines("C:\\code\\temp\\Day4\\input.txt");
+
+var targetWord = "XMAS";
+var targetWordReversed = "SAMX";
+
+var inpu = file;
+var array = new char [inpu[0].Length,inpu.Length];
+
+for (int i=0;i< array.GetLength(0); i++)
+{
+    for (int j=0;j< array.GetLength(1); j++)
+    {
+        array[i, j] = inpu[i][j];
+    }
+}
+
+var count = 0;
+
+
+for (int i=0;i< array.GetLength(0); i++)
+{
+    for (int j=0;j< array.GetLength(1); j++)
+    {
+        count += CheckNearPositions(i, j, array);
+
+    }
+}
+Console.WriteLine(count)
+;
+int CheckNearPositions(int x, int y, char [,] araay)
+{
+    var count = 0;
+    if (araay[x, y] != 'X')
+    {
+        return 0;
+    }
+
+    count += CheckHorizontal(x,y,array);
+    count += CheckHorizontalReverse(x,y,array);
+
+    count += ChecVertical(x,y,array);
+    count += ChecVerticalReverse(x,y,array);
+    count += ChecDiagona(x,y,array);
+    count += ChecDiagonalReverse(x,y,array);
+    count += CheckDiagonalDownLeft(x,y,array);
+    count += CheckDiagonalUpperRight(x,y,array);
+
+
+    
+    
+    return count;
+}
+
+int CheckHorizontalReverse(int x, int y, char [,] araay)
+{
+    if (y - 3 < 0)
+    {
+        return 0;
+    }
+    if ( araay[x,y -1] == 'M' && araay[x,y-2] == 'A' && araay[x,y-3] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+int CheckHorizontal(int x, int y, char [,] araay)
+{
+    if (y + 3 >=array.GetLength(1))
+    {
+        return 0;
+    }
+    if (araay[x,y +1] == 'M' && araay[x,y+2] == 'A' && araay[x,y+3] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+
+int ChecVerticalReverse(int x, int y, char [,] araay)
+{
+    if (x - 3 < 0)
+    {
+        return 0;
+    }
+    if (araay[x -1 ,y] == 'M' && araay[x-2,y] == 'A' && araay[x-3,y] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+int ChecVertical(int x, int y, char [,] araay)
+{
+    if (x + 3 >= array.GetLength(0))
+    {
+        return 0;
+    }
+    if ( araay[x+1,y ] == 'M' && araay[x+2,y] == 'A' && araay[x + 3,y] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+
+
+int ChecDiagonalReverse(int x, int y, char [,] araay)
+{
+    if (x - 3 < 0 || y-3 < 0)
+    {
+        return 0;
+    }
+    if (araay[x -1 ,y-1] == 'M' && araay[x-2,y-2] == 'A' && araay[x-3,y-3] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+int ChecDiagona(int x, int y, char [,] araay)
+{
+    if (x + 3 >= array.GetLength(0) || y+3 >= array.GetLength(1))
+    {
+        return 0;
+    }
+    if ( araay[x+1,y +1 ] == 'M' && araay[x+2,y+2] == 'A' && araay[x + 3,y+3] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+int CheckDiagonalDownLeft(int x, int y, char [,] araay)
+{
+    if (x + 3 >= array.GetLength(0) ||  y-3 < 0)
+    {
+        return 0;
+    }
+    if (araay[x +1 ,y-1] == 'M' && araay[x+2,y-2] == 'A' && araay[x+3,y-3] == 'S')
+    {
+        return 1;
+        
+    }
+
+    return 0;
+}
+
+int CheckDiagonalUpperRight(int x, int y, char[,] araay)
+{
+    if (x - 3 < 0 || y + 3 >= array.GetLength(1))
+    {
+        return 0;
+    }
+
+    if (araay[x - 1, y + 1] == 'M' && araay[x - 2, y + 2] == 'A' && araay[x - 3, y + 3] == 'S')
+    {
+        return 1;
+
+    }
+
+    return 0;
+}
+
+
+// PART 2
+
+
